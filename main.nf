@@ -13,7 +13,7 @@ process FASTP {
         'quay.io/biocontainers/fastp:0.23.4--hadf994f_1' }"
 
     output:
-    tuple val(sample_id), path("cleaned_{1,2}.fastq"), emit: cleaned_reads
+    tuple val(sample_id), path("cleaned_{1,2}.fastq"), emit: reads
     path("*-fastp.html"), emit: report_html
 
     script:
@@ -34,7 +34,7 @@ process MEGAHIT {
     tuple val(sample_id), path(reads)
 
     output:
-    path("${sample_id}-contigs.fasta"), emit: contigs
+    tuple val(sample_id), path("${sample_id}-contigs.fasta"), emit: contigs
 
     script:
     """
@@ -51,14 +51,14 @@ process QUAST {
         'quay.io/biocontainers/quast:5.2.0--py310pl5321h6cc9453_3' }"
 
     input:
-    path(contigs)
+    tuple val(sample_id), path(contigs)
 
     output:
-    path("quast_results"), emit: quast_results
+    path("${sample_id}-quast_results"), emit: quast_results
 
     script:
     """
-    quast -t $task.cpus $contigs
+    quast -t $task.cpus $contigs && mv quast_results ${sample_id}-quast_results
     """
 }
 
@@ -67,9 +67,7 @@ workflow {
 
     FASTP  ( reads_ch)
 
-    MEGAHIT( FASTP.out.filtered_reads)
+    MEGAHIT( FASTP.out.reads)
 
     QUAST  ( MEGAHIT.out.contigs)
 }
-
-
