@@ -27,3 +27,11 @@ nextflow run main.nf -profile singularity
 ```
 
 Output files should be in `results/`.
+
+You can specify different sets of reads using the `--reads` parameter.
+
+```bash
+nextflow run main.nf -profile singularity --reads 'data/reads/*_{1,2}.fastq.gz'
+```
+
+*Note the quotes to prevent the shell from expanding the file paths.*
