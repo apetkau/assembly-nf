@@ -7,7 +7,7 @@ This is an example pipeline for assembling a genome in nextflow. This pipeline m
 To install this pipeline, please make sure you have nextflow installed. This can be accomplished with:
 
 ```bash
-conda create --name nextflow nextflow
+conda create --name nextflow nextflow nf-core nf-test
 conda activate nextflow
 ```
 
