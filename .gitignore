@@ -1,3 +1,5 @@
 /results
 /work
 .nextflow*
+/.nf-test.log
+/.nf-test
