@@ -1,0 +1,21 @@
+nextflow_pipeline {
+
+    name "Test Pipeline with 1 process"
+    script "main.nf"
+
+    test("Should run without failures") {
+
+        when {
+            params {
+              reads = "$baseDir/data/reads/*_{1,2}.fastq.gz"
+              outdir = 'results'
+            }
+        }
+
+        then {
+            assert workflow.success
+
+            assert path("$launchDir/results/08-5578-small-contigs.fasta").text.contains(">k39_0 flag=1 multi=14.8960 len=6769")
+        }
+    }
+}
