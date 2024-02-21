@@ -1,3 +1,5 @@
+include { validateParameters } from 'plugin/nf-validation'
+
 process FASTP {
     publishDir params.outdir, mode:'copy', pattern: "*-fastp.html"
 
@@ -60,6 +62,8 @@ process QUAST {
 }
 
 workflow {
+    validateParameters()
+
     def reads_ch = Channel.fromFilePairs(params.reads)
 
     FASTP  ( reads_ch)
