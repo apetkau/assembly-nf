@@ -30,7 +30,7 @@
   "properties": {
     "reads": {
       "type": "string",
-      "default": "/home/apetkau/workspace/assembly-nf/data/reads/*_{1,2}.fastq.gz"
+      "default": "data/reads/*_{1,2}.fastq.gz"
     },
     "fastp_length": {
       "type": "integer",
