@@ -1,10 +1,10 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "https://raw.githubusercontent.com/apetkau/assembly-nf/master/nextflow_schema.json",
   "title": "apetkau/assembly-nf pipeline parameters",
   "description": "Example assembly pipeline",
   "type": "object",
-  "defs": {
+  "definitions": {
     "input_output_options": {
       "title": "Input/output options",
       "type": "object",
@@ -16,19 +16,25 @@
           "type": "string",
           "format": "directory-path",
           "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
-          "fa_icon": "fas fa-folder-open"
+          "fa_icon": "fas fa-folder-open",
+          "default": "results"
         }
       }
     }
   },
   "allOf": [
     {
-      "$ref": "#/defs/input_output_options"
+      "$ref": "#/definitions/input_output_options"
     }
   ],
   "properties": {
     "reads": {
-      "type": "string"
+      "type": "string",
+      "default": "/home/apetkau/workspace/assembly-nf/data/reads/*_{1,2}.fastq.gz"
+    },
+    "fastp_length": {
+      "type": "integer",
+      "default": 100
     }
   }
 }
