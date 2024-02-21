@@ -1,5 +1,4 @@
-params.reads = "$baseDir/data/reads/*_{1,2}.fastq.gz"
-params.outdir = "results"
+include { validateParameters } from 'plugin/nf-validation'
 
 process FASTP {
     publishDir params.outdir, mode:'copy', pattern: "*-fastp.html"
@@ -18,7 +17,7 @@ process FASTP {
 
     script:
     """
-    fastp --detect_adapter_for_pe --in1 ${reads[0]} --in2 ${reads[1]} --html ${sample_id}-fastp.html --out1 cleaned_1.fastq --out2 cleaned_2.fastq
+    fastp --detect_adapter_for_pe -l ${params.fastp_length} --in1 ${reads[0]} --in2 ${reads[1]} --html ${sample_id}-fastp.html --out1 cleaned_1.fastq --out2 cleaned_2.fastq
     """
 }
 
@@ -63,6 +62,8 @@ process QUAST {
 }
 
 workflow {
+    validateParameters()
+
     def reads_ch = Channel.fromFilePairs(params.reads)
 
     FASTP  ( reads_ch)
