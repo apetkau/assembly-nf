@@ -1,0 +1,4 @@
+sample,fastq_1,fastq_2
+08-5578-small,https://github.com/apetkau/assembly-nf/raw/main/data/reads/08-5578-small_1.fastq.gz,https://github.com/apetkau/assembly-nf/raw/main/data/reads/08-5578-small_2.fastq.gz
+08-5923-small,https://github.com/apetkau/assembly-nf/raw/main/data/reads/08-5923-small_1.fastq.gz,https://github.com/apetkau/assembly-nf/raw/main/data/reads/08-5923-small_2.fastq.gz
+hcc23-small,https://github.com/apetkau/assembly-nf/raw/main/data/reads/hcc23-small_1.fastq.gz,https://github.com/apetkau/assembly-nf/raw/main/data/reads/hcc23-small_2.fastq.gz

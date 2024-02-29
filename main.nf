@@ -1,10 +1,10 @@
-include { validateParameters } from 'plugin/nf-validation'
+include { validateParameters; fromSamplesheet } from 'plugin/nf-validation'
 
 process FASTP {
     publishDir params.outdir, mode:'copy', pattern: "*-fastp.html"
 
     input:
-    tuple val(sample_id), path(reads)
+    tuple val(meta), path(reads)
 
     conda "bioconda::fastp=0.23.4"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -12,12 +12,12 @@ process FASTP {
         'quay.io/biocontainers/fastp:0.23.4--hadf994f_1' }"
 
     output:
-    tuple val(sample_id), path("cleaned_{1,2}.fastq"), emit: reads
-    path("*-fastp.html"), emit: report_html
+    tuple val(meta), path("${meta.id}-cleaned_{1,2}.fastq"), emit: reads
+    tuple val(meta), path("*-fastp.html"), emit: report_html
 
     script:
     """
-    fastp --detect_adapter_for_pe -l ${params.fastp_length} --in1 ${reads[0]} --in2 ${reads[1]} --html ${sample_id}-fastp.html --out1 cleaned_1.fastq --out2 cleaned_2.fastq
+    fastp --detect_adapter_for_pe -l ${params.fastp_length} --in1 ${reads[0]} --in2 ${reads[1]} --html ${meta.id}-fastp.html --out1 ${meta.id}-cleaned_1.fastq --out2 ${meta.id}-cleaned_2.fastq
     """
 }
 
@@ -30,14 +30,14 @@ process MEGAHIT {
         'quay.io/biocontainers/megahit:1.2.9--h43eeafb_4' }"
 
     input:
-    tuple val(sample_id), path(reads)
+    tuple val(meta), path(reads)
 
     output:
-    tuple val(sample_id), path("${sample_id}-contigs.fasta"), emit: contigs
+    tuple val(meta), path("${meta.id}-contigs.fasta"), emit: contigs
 
     script:
     """
-    megahit -t $task.cpus -1 ${reads[0]} -2 ${reads[1]} -o megahit_out && cp megahit_out/final.contigs.fa ${sample_id}-contigs.fasta
+    megahit -t $task.cpus -1 ${reads[0]} -2 ${reads[1]} -o megahit_out && cp megahit_out/final.contigs.fa ${meta.id}-contigs.fasta
     """
 }
 
@@ -50,21 +50,23 @@ process QUAST {
         'quay.io/biocontainers/quast:5.2.0--py310pl5321h6cc9453_3' }"
 
     input:
-    tuple val(sample_id), path(contigs)
+    tuple val(meta), path(contigs)
 
     output:
-    path("${sample_id}-quast_results"), emit: quast_results
+    tuple val(meta), path("${meta.id}-quast_results"), emit: quast_results
 
     script:
     """
-    quast -t $task.cpus $contigs && mv quast_results ${sample_id}-quast_results
+    quast -t $task.cpus $contigs && mv quast_results ${meta.id}-quast_results
     """
 }
 
 workflow {
     validateParameters()
 
-    def reads_ch = Channel.fromFilePairs(params.reads)
+    Channel.fromSamplesheet("input")
+           .map {meta, fastq_1, fastq_2 -> [meta, [fastq_1, fastq_2]]}
+           .set { reads_ch }
 
     FASTP  ( reads_ch)
 
